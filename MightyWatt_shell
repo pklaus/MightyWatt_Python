@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+from mw import MightyWatt
+import cmd, sys
+
+class MightyWattShell(cmd.Cmd):
+    intro = 'Welcome to the MightyWatt shell.   Type help or ? to list commands.\n'
+    prompt = '(MightyWatt) > '
+    UPDATE_fmt = "{voltage:.3f} V | {current:.3f} A | {power:.2f} W | {resistance:.1f} Ω  | {temperature:3d} ℃ | remote: {remoteStatus}"
+    mw = None
+
+    def onecmd(self, line):
+        try:
+            return cmd.Cmd.onecmd(self, line)
+        except Exception as e:
+            print("An error occured:")
+            print(str(e))
+
+    def do_cc(self, arg):
+        'Set constant current mode'
+        current = float(arg)
+        self.mw.set_cc(current)
+
+    def do_cv(self, arg):
+        'Set constant voltage mode'
+        voltage = float(arg)
+        self.mw.set_cv(voltage)
+
+    def do_cp(self, arg):
+        'Set constant power mode'
+        power = float(arg)
+        self.mw.set_cp(power)
+
+    def do_cr(self, arg):
+        'Set constant resistance mode'
+        resistance = float(arg)
+        self.mw.set_cr(resistance)
+
+    def do_local(self, arg):
+        'Enable local voltage sensing'
+        self.mw.set_remote(False)
+
+    def do_remote(self, arg):
+        'Enable remote voltage sensing'
+        self.mw.set_remote(True)
+
+    def do_update(self, arg):
+        'Request a status update from the MightyWatt'
+        self.mw.update()
+        status = self.mw.status.copy()
+        status['power'] = status['voltage']*status['current']
+        if status['current'] != 0.0:
+            status['resistance'] = status['voltage']/status['current']
+        else:
+            status['resistance'] = self.mw.props['DVM_INPUT_RESISTANCE']
+        print(self.UPDATE_fmt.format(**status))
+        #self.prompt = self.UPDATE_fmt.format(**self.mw.status) + " > "
+
+    do_u = do_update
+
+    def do_quit(self, arg):
+        'Quit this session'
+        return True
+
+    do_EOF = do_quit
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description='MightyWatt shell')
+    parser.add_argument('serial_port', help='The serial port to connect to')
+    args = parser.parse_args()
+    mw = MightyWatt(args.serial_port)
+    mws = MightyWattShell()
+    mws.mw = mw
+    mws.cmdloop()
+
+if __name__ == "__main__":
+    main()
