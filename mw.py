@@ -83,6 +83,9 @@ class MightyWatt(object):
 
     def update(self):
         self._c.write(b"\x8F")
+        self._update_status()
+
+    def _update_status(self):
         time.sleep(0.02)
         response = self._c.read(struct.calcsize(MightyWatt.UPD_fmt))
         self._set_status(response)
@@ -90,9 +93,28 @@ class MightyWatt(object):
     def set_cc(self, current):
         current = int(round(current*1000.))
         self._c.write(struct.pack('>BH', MightyWatt.MODE_CC, current))
-        time.sleep(0.02)
-        response = self._c.read(struct.calcsize(MightyWatt.UPD_fmt))
-        self._set_status(response)
+        self._update_status()
+
+    def set_cv(self, voltage):
+        voltage = int(round(voltage*1000.))
+        self._c.write(struct.pack('>BH', MightyWatt.MODE_CV, voltage))
+        self._update_status()
+
+    def set_cp(self, power):
+        power = int(round(power*1000.))
+        power = three_bytes(power)
+        self._c.write(struct.pack('>BBBB', MightyWatt.MODE_CP, *power))
+        self._update_status()
+
+    def set_cr(self, resistance):
+        resistance = int(round(resistance*1000.))
+        resistance = three_bytes(resistance)
+        self._c.write(struct.pack('>BBBB', MightyWatt.MODE_CR, *resistance))
+        self._update_status()
+
+    def set_remote(self, remote=True):
+        self._c.write(struct.pack('>BB', MightyWatt.REMOTE_ID, int(remote)))
+        self._update_status()
 
     def _set_status(self, response):
         response = struct.unpack(MightyWatt.UPD_fmt, response)
@@ -104,6 +126,9 @@ class MightyWatt(object):
 
     def print_status(self):
         pprint(self.status)
+
+def three_bytes(value):
+    return (value >> 16 & 0xFF, value >> 8 & 0xFF, value & 0xFF)
 
 def main():
     import argparse
@@ -117,6 +142,32 @@ def main():
     mw.set_cc(1.00)
     mw.print_status()
     time.sleep(0.5)
+    mw.set_cc(1.00)
+    mw.print_status()
+    time.sleep(0.5)
+    mw.update()
+    mw.print_status()
+    #mw.set_remote()
+    mw.print_status()
+    time.sleep(0.5)
+    mw.update()
+    mw.print_status()
+    mw.set_cp(2.5)
+    mw.print_status()
+    time.sleep(0.7)
+    mw.update()
+    mw.print_status()
+    time.sleep(2.5)
+    mw.update()
+    mw.print_status()
+    mw.set_cv(5.1)
+    mw.print_status()
+    time.sleep(0.7)
+    mw.set_cv(5.1)
+    time.sleep(0.7)
+    mw.update()
+    mw.print_status()
+    time.sleep(2.5)
     mw.update()
     mw.print_status()
 
