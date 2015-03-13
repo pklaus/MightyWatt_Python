@@ -2,13 +2,28 @@
 # -*- coding: utf-8 -*-
 
 from mw import MightyWatt
-import cmd, sys
+import cmd
+from blessings import Terminal
 
 class MightyWattShell(cmd.Cmd):
     intro = 'Welcome to the MightyWatt shell.   Type help or ? to list commands.\n'
     prompt = '(MightyWatt) > '
-    UPDATE_fmt = "{voltage:.3f} V | {current:.3f} A | {power:.2f} W | {resistance:.1f} Ω  | {temperature:3d} ℃ | remote: {remoteStatus}"
+    UNITS_fmt = {
+        'voltage':     "{:.3f} V",
+        'current':     "{:.3f} A",
+        'power':       "{:.2f} W",
+        'resistance':  "{:.1f} Ω",
+        'temperature': "{:2d} ℃ ",
+        'remote':      "remote: {}"
+    }
+    UPDATE_fmt = "{t.red}{voltage}{t.normal} | " \
+                 "{t.green}{current}{t.normal} | " \
+                 "{t.blue}{power}{t.normal} | " \
+                 "{t.cyan}{resistance}{t.normal} | " \
+                 "{t.magenta}{temperature}{t.normal} | " \
+                 "{remote}"
     mw = None
+    term = None
 
     def onecmd(self, line):
         try:
@@ -37,6 +52,11 @@ class MightyWattShell(cmd.Cmd):
         resistance = float(arg)
         self.mw.set_cr(resistance)
 
+    def do_stop(self, arg):
+        self.mw.stop()
+
+    do_s = do_stop
+
     def do_local(self, arg):
         'Enable local voltage sensing'
         self.mw.set_remote(False)
@@ -49,18 +69,22 @@ class MightyWattShell(cmd.Cmd):
         'Request a status update from the MightyWatt'
         self.mw.update()
         status = self.mw.status.copy()
+        status['remote'] = status['remoteStatus']
         status['power'] = status['voltage']*status['current']
         if status['current'] != 0.0:
             status['resistance'] = status['voltage']/status['current']
         else:
             status['resistance'] = self.mw.props['DVM_INPUT_RESISTANCE']
-        print(self.UPDATE_fmt.format(**status))
-        #self.prompt = self.UPDATE_fmt.format(**self.mw.status) + " > "
+        with self.term.location(0, self.term.height-1):
+            status = {s: self.UNITS_fmt[s].format(status[s]) for s in self.UNITS_fmt}
+            print(self.UPDATE_fmt.format(t=self.term, **status))
 
     do_u = do_update
 
     def do_quit(self, arg):
         'Quit this session'
+        print('Quitting...')
+        self.mw.close()
         return True
 
     do_EOF = do_quit
@@ -73,7 +97,11 @@ def main():
     mw = MightyWatt(args.serial_port)
     mws = MightyWattShell()
     mws.mw = mw
-    mws.cmdloop()
+    mws.term = Terminal()
+    try:
+        mws.cmdloop()
+    except KeyboardInterrupt:
+        mws.do_quit('')
 
 if __name__ == "__main__":
     main()

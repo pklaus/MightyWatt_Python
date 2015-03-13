@@ -5,6 +5,7 @@ import serial
 import struct
 import time
 from pprint import pprint
+import threading
 
 class MightyWatt(object):
 
@@ -53,6 +54,8 @@ class MightyWatt(object):
         self.verbose = verbose
         self._connect()
         if self.verbose: self.print_device_summary()
+        self.timer = PerpetualTimer(0.2, self.update)
+        self.timer.start()
 
     def _connect(self):
         self._c = serial.Serial(self.port, 115200, timeout=0)
@@ -117,6 +120,9 @@ class MightyWatt(object):
         self._c.write(struct.pack('>BB', MightyWatt.REMOTE_ID, int(remote)))
         self._update_status()
 
+    def set_local(self, local=True):
+        self.set_remote(not local)
+
     def _set_status(self, response):
         response = struct.unpack(MightyWatt.UPD_fmt, response)
         status = dict()
@@ -127,6 +133,39 @@ class MightyWatt(object):
 
     def print_status(self):
         pprint(self.status)
+
+    def stop(self):
+        self.set_cc(0.0)
+        self.set_local()
+
+    def close(self):
+        try:
+            self.stop()
+        except:
+            pass
+        try:
+            self.timer.stop()
+        except:
+            pass
+
+    def __del__(self):
+        self.close()
+
+class PerpetualTimer(threading.Thread):
+    def __init__(self, wait_time, func, *args):
+        self.wait_time = wait_time
+        self.func = func
+        self.args = args
+        threading.Thread.__init__(self)
+        self.event = threading.Event()
+
+    def run(self):
+        while not self.event.is_set():
+            self.func(*self.args)
+            self.event.wait(0.2)
+
+    def stop(self):
+        self.event.set()
 
 def three_bytes(value):
     return (value >> 16 & 0xFF, value >> 8 & 0xFF, value & 0xFF)
@@ -171,6 +210,7 @@ def main():
     time.sleep(2.5)
     mw.update()
     mw.print_status()
+    mw.close()
 
 if __name__ == "__main__":
     main()
