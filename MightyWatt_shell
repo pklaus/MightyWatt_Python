@@ -8,6 +8,7 @@ from blessings import Terminal
 class MightyWattShell(cmd.Cmd):
     intro = 'Welcome to the MightyWatt shell.   Type help or ? to list commands.\n'
     prompt = '(MightyWatt) > '
+    undoc_header = None
     UNITS_fmt = {
         'voltage':     "{:.3f} V",
         'current':     "{:.3f} A",
@@ -53,9 +54,8 @@ class MightyWattShell(cmd.Cmd):
         self.mw.set_cr(resistance)
 
     def do_stop(self, arg):
+        'Stop the MightyWatt (set CC mode with 0.0 A, local sensing)'
         self.mw.stop()
-
-    do_s = do_stop
 
     def do_local(self, arg):
         'Enable local voltage sensing'
@@ -65,7 +65,7 @@ class MightyWattShell(cmd.Cmd):
         'Enable remote voltage sensing'
         self.mw.set_remote(True)
 
-    def do_update(self, arg):
+    def do_status(self, arg):
         'Request a status update from the MightyWatt'
         self.mw.update()
         status = self.mw.status.copy()
@@ -79,8 +79,6 @@ class MightyWattShell(cmd.Cmd):
             status = {s: self.UNITS_fmt[s].format(status[s]) for s in self.UNITS_fmt}
             print(self.UPDATE_fmt.format(t=self.term, **status))
 
-    do_u = do_update
-
     def do_quit(self, arg):
         'Quit this session'
         print('Quitting...')
@@ -88,6 +86,22 @@ class MightyWattShell(cmd.Cmd):
         return True
 
     do_EOF = do_quit
+
+    def print_topics(self, header, cmds, cmdlen, maxcol):
+        if not header: return
+        if cmds:
+            self.stdout.write("%s\n"%str(header))
+            if self.ruler:
+                self.stdout.write("%s\n"%str(self.ruler * len(header)))
+            cmds.remove('quit')
+            cmds.append('quit')
+            for cmd in cmds:
+                if len(cmd) == 1: continue
+                if cmd == 'EOF': continue
+                if cmd == 'help': continue
+                print(cmd)
+                print(getattr(self, 'do_' + cmd).__doc__)
+            self.stdout.write("\n")
 
 def main():
     import argparse
