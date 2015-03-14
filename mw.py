@@ -66,6 +66,7 @@ class MightyWatt(object):
         self._message_size = struct.calcsize(MightyWatt.UPD_fmt)
         self._message_queue = queue.Queue()
         self._connect()
+        self._update()
         if self.verbose: self.print_device_summary()
         self._timer = PerpetualTimer(1/self._update_rate, self._update)
         self._timer.start()
@@ -77,7 +78,6 @@ class MightyWatt(object):
             raise MightyWattCommunicationException()
         self._identify()
         self._read_properties()
-        self._update()
 
     def _identify(self):
         while not self.identity and self._idn_tries > 0:
