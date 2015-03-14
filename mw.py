@@ -103,7 +103,7 @@ class MightyWatt(object):
     def _read(self, *args, **kwargs):
         try:
             return self._c.read(*args, **kwargs)
-        except (OSError, serial.serialutil.SerialException):
+        except (TypeError, OSError, serial.serialutil.SerialException):
             raise MightyWattCommunicationException()
 
     def _readline(self):
