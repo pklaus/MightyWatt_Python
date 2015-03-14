@@ -6,6 +6,7 @@ import struct
 import time
 from pprint import pprint
 import threading
+import queue
 
 class MightyWatt(object):
 
@@ -49,55 +50,64 @@ class MightyWatt(object):
     TEMPERATURE_THRESHOLD_ID = 4 | 0x80 | (1 << 5)
     REMOTE_ID = 5 | 0x80 | (1 << 5)
 
-    update_rate = 5
-    props = None
-    message_size = 0
     identity = None
-    idn_tries = 20
-    qdc_tries = 20
+    props = None
+    status = None
+    _update_rate = 10
+    _message_size = 0
+    _idn_tries = 20
+    _qdc_tries = 20
+    _min_update_interval = 0.005
+    _message_queue = None
+    _wait_after_write = 0.002
+    _last_write_time = None
 
     def __init__(self, port, verbose=False):
         self.port = port
         self.verbose = verbose
-        self.message_size = struct.calcsize(MightyWatt.UPD_fmt)
+        self._message_size = struct.calcsize(MightyWatt.UPD_fmt)
+        self._message_queue = queue.Queue()
+        self._last_write_time = clock()
         self._connect()
         if self.verbose: self.print_device_summary()
-        self.timer = PerpetualTimer(1/self.update_rate, self.update)
-        self.timer.start()
+        self._timer = PerpetualTimer(1/self._update_rate, self._update)
+        self._timer.start()
 
     def _connect(self):
         try:
             self._c = serial.Serial(self.port, 115200, timeout=0.1)
         except (serial.serialutil.SerialException, FileNotFoundError):
             raise MightyWattCommunicationException()
-        #time.sleep(0.001)
         self._identify()
         self._read_properties()
-        self.update()
+        self._update()
 
     def _identify(self):
-        while not self.identity and self.idn_tries > 0:
+        while not self.identity and self._idn_tries > 0:
             answer = ''
             try:
                 self._write(MightyWatt.IDN_q)
-                time.sleep(0.02)
                 answer = self._readline()
                 assert answer == MightyWatt.IDN_r + MightyWatt.LE, "strange answer: " + answer
                 self.identity = answer.strip()
                 return
             except AssertionError:
                 if self.verbose: print('Not a valid IDN response: ' + str(answer))
-                self.idn_tries -= 1
+                self._idn_tries -= 1
                 time.sleep(0.1)
         raise MightyWattCommunicationException("Didn't get a proper IDN response.")
 
     def _write(self, *args, **kwargs):
+        self._last_write_time = clock()
         try:
             return self._c.write(*args, **kwargs)
         except (OSError, serial.serialutil.SerialException):
             raise MightyWattCommunicationException()
 
     def _read(self, *args, **kwargs):
+        wait_time = (self._wait_after_write - (clock() - self._last_write_time))
+        if wait_time > 0.0:
+            time.sleep(wait_time)
         try:
             return self._c.read(*args, **kwargs)
         except (OSError, serial.serialutil.SerialException):
@@ -110,14 +120,10 @@ class MightyWatt(object):
             raise MightyWattCommunicationException()
 
     def _read_properties(self):
-        while not self.props and self.qdc_tries > 0:
+        while not self.props and self._qdc_tries > 0:
             response = []
             try:
                 self._write(MightyWatt.QDC_q)
-                time.sleep(0.02)
-                #response = self._read(200).decode('ascii')
-                #response = response.strip()
-                #response = response.split(MightyWatt.LE)
                 response = [self._readline() for i in range(len(MightyWatt.QDC_r))]
                 assert len(response) == len(MightyWatt.QDC_r)
                 props = {}
@@ -128,7 +134,7 @@ class MightyWatt(object):
                 return
             except (AssertionError, ValueError):
                 if self.verbose: print("Not a valid QDC response: " + str(response))
-                self.qdc_tries -= 1
+                self._qdc_tries -= 1
                 time.sleep(0.1)
         raise MightyWattCommunicationException("Didn't get a proper QDC response.")
 
@@ -137,49 +143,43 @@ class MightyWatt(object):
         print("Properties:")
         pprint(self.props)
 
-    def update(self):
-        self._write(b"\x8F")
-        self._update_status()
-
-    def set_update_rate(self, rate):
-        assert rate < 30 and rate > 1.2
-        self.timer.wait_time = 1/self.update_rate
-
-    def _update_status(self):
-        time.sleep(0.02)
+    def _update(self):
+        self._last_update = clock()
         try:
-            response = self._read(self.message_size)
-        except (OSError, serial.serialutil.SerialException):
-            raise MightyWattCommunicationException()
-        if len(response) != self.message_size:
+            message = self._message_queue.get(block=False)
+        except:
+            message = b"\x8F"
+        self._write(message)
+        response = self._read(self._message_size)
+        if len(response) != self._message_size:
             raise MightyWattCommunicationException()
         self._set_status(response)
 
+    def set_update_rate(self, rate):
+        assert (rate > 1.2) and (1/rate >= self._min_update_interval)
+        self._update_rate = rate
+        self._timer.wait_time = 1/self._update_rate
+
     def set_cc(self, current):
         current = int(round(current*1000.))
-        self._write(struct.pack('>BH', MightyWatt.MODE_CC, current))
-        self._update_status()
+        self._message_queue.put(struct.pack('>BH', MightyWatt.MODE_CC, current))
 
     def set_cv(self, voltage):
         voltage = int(round(voltage*1000.))
-        self._write(struct.pack('>BH', MightyWatt.MODE_CV, voltage))
-        self._update_status()
+        self._message_queue.put(struct.pack('>BH', MightyWatt.MODE_CV, voltage))
 
     def set_cp(self, power):
         power = int(round(power*1000.))
         power = three_bytes(power)
-        self._write(struct.pack('>BBBB', MightyWatt.MODE_CP, *power))
-        self._update_status()
+        self._message_queue.put(struct.pack('>BBBB', MightyWatt.MODE_CP, *power))
 
     def set_cr(self, resistance):
         resistance = int(round(resistance*1000.))
         resistance = three_bytes(resistance)
-        self._write(struct.pack('>BBBB', MightyWatt.MODE_CR, *resistance))
-        self._update_status()
+        self._message_queue.put(struct.pack('>BBBB', MightyWatt.MODE_CR, *resistance))
 
     def set_remote(self, remote=True):
-        self._write(struct.pack('>BB', MightyWatt.REMOTE_ID, int(remote)))
-        self._update_status()
+        self._message_queue.put(struct.pack('>BB', MightyWatt.REMOTE_ID, int(remote)))
 
     def set_local(self, local=True):
         self.set_remote(not local)
@@ -205,7 +205,7 @@ class MightyWatt(object):
         except:
             pass
         try:
-            self.timer.stop()
+            self._timer.stop()
         except:
             pass
 
@@ -234,6 +234,11 @@ class PerpetualTimer(threading.Thread):
     def stop(self):
         self.event.set()
 
+try:
+    clock = time.perf_counter
+except AttributeError:
+    clock = time.time
+
 def three_bytes(value):
     return (value >> 16 & 0xFF, value >> 8 & 0xFF, value & 0xFF)
 
@@ -248,41 +253,37 @@ def main():
             mw = MightyWatt(args.serial_port, verbose=args.verbose)
         except MightyWattCommunicationException:
             parser.error('An error occured, could not establish a connection to the device.')
-        mw.update()
         mw.print_status()
         mw.set_cc(1.00)
+        mw.set_update_rate(100)
         mw.print_status()
         time.sleep(0.5)
         mw.set_cc(1.00)
         mw.print_status()
         time.sleep(0.5)
-        mw.update()
         mw.print_status()
         #mw.set_remote()
         mw.print_status()
         time.sleep(0.5)
-        mw.update()
         mw.print_status()
         mw.set_cp(2.5)
         mw.print_status()
         time.sleep(0.7)
-        mw.update()
         mw.print_status()
         time.sleep(2.5)
-        mw.update()
         mw.print_status()
         mw.set_cv(5.1)
         mw.print_status()
         time.sleep(0.7)
         mw.set_cv(5.1)
         time.sleep(0.7)
-        mw.update()
         mw.print_status()
         time.sleep(2.5)
-        mw.update()
         mw.print_status()
         mw.close()
     except KeyboardInterrupt:
+        print("Pressed Ctrl-C. Exiting...")
+    finally:
         try:
             mw.close()
         except:
