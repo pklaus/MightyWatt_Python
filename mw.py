@@ -59,15 +59,12 @@ class MightyWatt(object):
     _qdc_tries = 20
     _min_update_interval = 0.005
     _message_queue = None
-    _wait_after_write = 0.002
-    _last_write_time = None
 
     def __init__(self, port, verbose=False):
         self.port = port
         self.verbose = verbose
         self._message_size = struct.calcsize(MightyWatt.UPD_fmt)
         self._message_queue = queue.Queue()
-        self._last_write_time = clock()
         self._connect()
         if self.verbose: self.print_device_summary()
         self._timer = PerpetualTimer(1/self._update_rate, self._update)
@@ -98,16 +95,12 @@ class MightyWatt(object):
         raise MightyWattCommunicationException("Didn't get a proper IDN response.")
 
     def _write(self, *args, **kwargs):
-        self._last_write_time = clock()
         try:
             return self._c.write(*args, **kwargs)
         except (OSError, serial.serialutil.SerialException):
             raise MightyWattCommunicationException()
 
     def _read(self, *args, **kwargs):
-        wait_time = (self._wait_after_write - (clock() - self._last_write_time))
-        if wait_time > 0.0:
-            time.sleep(wait_time)
         try:
             return self._c.read(*args, **kwargs)
         except (OSError, serial.serialutil.SerialException):
@@ -144,7 +137,6 @@ class MightyWatt(object):
         pprint(self.props)
 
     def _update(self):
-        self._last_update = clock()
         try:
             message = self._message_queue.get(block=False)
         except:
