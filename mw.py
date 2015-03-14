@@ -192,17 +192,19 @@ class MightyWatt(object):
         self.set_local()
 
     def close(self):
-        try:
-            self.stop()
-        except:
-            pass
-        try:
-            self._timer.stop()
-        except:
-            pass
+        self._timer.stop()
+        self._timer.join()
+        self.set_cc(0.0)
+        self._update()
+        self.set_local()
+        self._update()
+        self._c.close()
 
     def __del__(self):
-        self.close()
+        try:
+            self.close()
+        except:
+            pass
 
 class MightyWattException(Exception):
     pass
