@@ -1,0 +1,149 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import urllib.parse
+import urllib.request
+import json
+import time
+from datetime import datetime as dt
+import sys
+
+clock = time.perf_counter
+
+class MightyWattWebClient(object):
+
+    def __init__(self, server_url):
+        self.server_url = server_url
+
+    @property
+    def status(self):
+        return self.get_json('/api/status')
+
+    def set_mode(self, mode, value):
+        mode = mode.lower()
+        assert mode in "CC CV CP CR".lower().split()
+        result = self.get_json('/api/mode/{}/{:.3f}'.format(mode, value))
+
+    def stop(self):
+        self.get_json('/api/stop')
+
+    def set_remote(self):
+        self.get_json('/api/voltage-sensing/remote')
+
+    def set_local(self):
+        self.get_json('/api/voltage-sensing/local')
+
+    def get_json(self, address):
+        url = urllib.parse.urljoin(self.server_url, address)
+        response = urllib.request.urlopen(url)
+        data = response.read()
+        return json.loads(data.decode('utf-8'))
+
+def header():
+    sys.stdout.write("MightyWatt Log File\n")
+    sys.stdout.write(dt.now().strftime('Started on\t%d/%m/%Y\t%I:%M:%S %p\n'))
+    sys.stdout.write("Current [A]	Voltage [V]	Time since start [s]	Temperature [deg C]\n")
+
+def watchdog_parser(input_string):
+    conditions=[]
+    for input_chunk in input_string.split(','):
+        input_chunk = input_chunk.strip()
+        assert len(input_chunk) > 2
+        dimension = input_chunk[0].upper()
+        condition = input_chunk[1]
+        value = input_chunk[2:]
+        assert dimension in ['C', 'V', 'P', 'R', 'T']
+        assert condition in ['<', '>']
+        keys = {'C': 'current', 'V': 'voltage', 'P': 'power', 'R': 'resistance', 'T': 'temperature'}
+        dimension = keys[dimension]
+        value = float(value)
+        conditions.append(dict(dimension=dimension, condition=condition, value=value))
+    return conditions
+
+def check_watchdog(wl, status):
+    """ wl = watchdog list """
+    status = status.copy()
+    for w in wl:
+        try:
+            if w['condition'] == '>':
+                assert status[w['dimension']] > w['value']
+            if w['condition'] == '<':
+                assert status[w['dimension']] < w['value']
+            return
+        except AssertionError:
+            pass
+        raise WatchdogException(w, status)
+
+class WatchdogException(Exception):
+    def __init__(self, watchdog, status):
+        self.watchdog = watchdog
+        self.status = status
+    def __str__(self):
+        return 'The watchdog triggered while checking {dimension} {condition} {value}'.format(**self.watchdog)
+
+def main():
+    import argparse
+    # create the top-level parser
+    parser = argparse.ArgumentParser(description='MightyWatt Web Client')
+    parser.add_argument('server_url', help='The URL of the MightyWatt web server')
+    parser.add_argument('--freq', type=float, default=10.0, help='Output frequency')
+    parser.add_argument('--remote', action='store_true', help='Switch to remote voltage sensing')
+    parser.add_argument('--local', action='store_true', help='Switch to local voltage sensing')
+    parser.add_argument('--debug', action='store_true', help='Debug mode')
+    parser.add_argument('--watchdog', type=watchdog_parser, default=watchdog_parser('V>0.5'), help='Output frequency')
+    subparsers = parser.add_subparsers(dest='command', help='sub-command help')
+    
+    # create the parser for the "ramp" command
+    parser_ramp = subparsers.add_parser('ramp', help='Ramping the load')
+    parser_ramp.add_argument('mode', choices='CC CV CP CR'.split(), help='Mode of Operation')
+    parser_ramp.add_argument('start_value', type=float, help='Start value')
+    parser_ramp.add_argument('final_value', type=float, help='Final value')
+    parser_ramp.add_argument('--duration', type=float, default=60., help='Duration of the ramping in s.')
+    
+    # create the parser for the "status" command
+    parser_status = subparsers.add_parser('status', help='Print status updates')
+    parser_status.add_argument('--duration', type=float, default=60., help='Duration of the status output in s.')
+    
+    # parse some argument lists
+    args = parser.parse_args()
+
+    if args.remote and args.local: parser.error('Please select --remote OR --local.')
+
+    try:
+        try:
+            mwwc = MightyWattWebClient(args.server_url)
+        except:
+            parser.error("Couldn't connect to the server.")
+        period = 1/args.freq
+        if args.remote: mwwc.set_remote()
+        if args.local: mwwc.set_local()
+        header()
+        start = clock()
+        last = clock() - period
+        mw_rel_time = mwwc.status['time']
+        flush_period = 5.0
+        last_flush = clock()
+        while (clock() - start) <= args.duration:
+            wait_time = period - (clock() - last)
+            if wait_time > 0: time.sleep(wait_time)
+            last += period
+            if args.command == 'ramp':
+                new_value = args.start_value + (args.final_value - args.start_value) / args.duration * (clock() - start)
+                mwwc.set_mode(args.mode, new_value)
+            status = mwwc.status
+            status['time'] -= mw_rel_time
+            sys.stdout.write("{current:.3f}\t{voltage:.3f}\t{time:.3f}\t{temperature:d}\n".format(**status))
+            if clock() - last_flush > flush_period:
+                last_flush = clock()
+                sys.stdout.flush()
+            check_watchdog(args.watchdog, status)
+    except WatchdogException as we:
+        sys.stderr.write(str(we) + '\n')
+        sys.stderr.write("closing")
+    except KeyboardInterrupt:
+        sys.stderr.write(' Ctrl-C pressed. Exiting...')
+    finally:
+        mwwc.stop()
+
+if __name__ == "__main__":
+    main()

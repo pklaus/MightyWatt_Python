@@ -1,0 +1,10 @@
+
+@media (min-width: 1180px) {
+
+  .jumbotron {
+    background-image: url("/static/images/MightyWatt_wide_small-gray.jpg");
+    background-repeat: no-repeat;
+    background-position: right; 
+  }
+
+}
