@@ -99,8 +99,7 @@ class MightyWattShell(cmd.Cmd):
                 if len(cmd) == 1: continue
                 if cmd == 'EOF': continue
                 if cmd == 'help': continue
-                print(cmd)
-                print(getattr(self, 'do_' + cmd).__doc__)
+                print("{:7s} - {}".format(cmd, getattr(self, 'do_' + cmd).__doc__))
             self.stdout.write("\n")
 
 def main():
