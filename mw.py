@@ -206,7 +206,6 @@ class MightyWatt(object):
 
     def stop(self):
         self.set_cc(0.0)
-        self.set_local()
 
     def close(self):
         self._timer.stop()
