@@ -66,15 +66,8 @@ class MightyWattShell(cmd.Cmd):
         self.mw.set_remote(True)
 
     def do_status(self, arg):
-        'Request a status update from the MightyWatt'
-        self.mw.update()
-        status = self.mw.status.copy()
-        status['remote'] = status['remoteStatus']
-        status['power'] = status['voltage']*status['current']
-        if status['current'] != 0.0:
-            status['resistance'] = status['voltage']/status['current']
-        else:
-            status['resistance'] = self.mw.props['DVM_INPUT_RESISTANCE']
+        'Print status of the MightyWatt'
+        status = self.mw.status
         with self.term.location(0, self.term.height-1):
             status = {s: self.UNITS_fmt[s].format(status[s]) for s in self.UNITS_fmt}
             print(self.UPDATE_fmt.format(t=self.term, **status))

@@ -52,7 +52,7 @@ class MightyWatt(object):
 
     identity = None
     props = None
-    status = None
+    _status = None
     _update_rate = 10
     _message_size = 0
     _idn_tries = 20
@@ -65,6 +65,7 @@ class MightyWatt(object):
         self.verbose = verbose
         self._message_size = struct.calcsize(MightyWatt.UPD_fmt)
         self._message_queue = queue.Queue()
+        self._start = clock()
         self._connect()
         self._update()
         if self.verbose: self.print_device_summary()
@@ -176,16 +177,32 @@ class MightyWatt(object):
     def set_local(self, local=True):
         self.set_remote(not local)
 
+    @property
+    def status(self):
+        assert self.ms_since_last_update < 1000.0
+        return self._status.copy()
+
     def _set_status(self, response):
         response = struct.unpack(MightyWatt.UPD_fmt, response)
         status = dict()
         for i in range(len(MightyWatt.UPD_r)):
             value = MightyWatt.UPD_r[i][1](response[i])
             status[MightyWatt.UPD_r[i][0]] = value
-        self.status = status
+        status['remote'] = status['remoteStatus']
+        status['power'] = status['voltage'] * status['current']
+        if status['current'] != 0.0:
+            status['resistance'] = status['voltage'] / status['current']
+        else:
+            status['resistance'] = self.props['DVM_INPUT_RESISTANCE']
+        status['time'] = clock() - self._start
+        self._status = status
 
     def print_status(self):
         pprint(self.status)
+
+    @property
+    def ms_since_last_update(self):
+        return ((clock() - self._start) - self._status['time']) * 1000.
 
     def stop(self):
         self.set_cc(0.0)
