@@ -34,47 +34,45 @@
 
             <div class="panel panel-default">
               <div class="panel-heading"><h4 class="panel-title">Live Monitor of the MightyWatt</h4></div>
-              <table class="panel-table table" id="liveMonitor">
+              <table class="panel-table table table-condensed" id="liveMonitor">
                 <tbody>
                   <tr>
-                    <td>
-                      Voltage:
-                    </td><td class="numeric-cell">
+                    <td>Voltage:</td>
+                    <td class="numeric-cell">
                       <span id="voltage">0.000</span> V 
-                      <span id="voltageWarning" class="label invisible">
+                      <span id="voltageWarning" class="warnung label invisible">
                         <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
                       </span>
-                    </td><td>
-                      Current:
-                    </td><td class="numeric-cell">
+                    </td>
+                    <td>Current:</td>
+                    <td class="numeric-cell">
                       <span id="current">0.000</span> A 
-                      <span id="currentWarning" class="label invisible">
+                      <span id="currentWarning" class="warnung label invisible">
                         <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
                       </span>
                     </td>
                   </tr><tr>
-                    <td>
-                      Power:
-                    </td><td class="numeric-cell">
+                    <td>Power:</td>
+                    <td class="numeric-cell">
                       <span id="power">0.000</span> W 
-                      <span id="powerWarning" class="label invisible">
+                      <span id="powerWarning" class="warnung label invisible">
                         <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
                       </span>
-                    </td><td>
-                      Resistance:
-                    </td><td class="numeric-cell">
+                    </td>
+                    <td>Resistance:</td>
+                    <td class="numeric-cell">
                       <span id="resistance">-</span> Ω 
-                      <span id="resistanceWarning" class="label invisible">
+                      <span id="resistanceWarning" class="warnung label invisible">
                         <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
                       </span>
                     </td>
                   </tr><tr>
-                    <td colspan="2">
-                      Temperature: <span id="temperature">-</span> °C 
-                      <span id="temperatureWarning" class="label invisible">
+                    <td colspan="2">Temperature: <span id="temperature">-</span> °C 
+                      <span id="temperatureWarning" class="warnung label invisible">
                         <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
                       </span>
-                    </td><td colspan="2">
+                    </td>
+                    <td colspan="2">
                       (T<sub>Thresh</sub> = <span id="temperatureThreshold">-</span> °C)
                     </td>
                   </tr>
@@ -116,7 +114,7 @@
                   <label id="inputValueLabel" for="inputValue">Constant current mode:</label>
                   <div class="input-group">
                     <div id="inputValuePre" class="input-group-addon">Current</div>
-                    <input id="inputValue" type="text" class="form-control" placeholder="0.000" autocomplete="off">
+                    <input id="inputValue" type="number" step="any" class="form-control" placeholder="0.000" autocomplete="off">
                     <div id="inputValuePost" class="input-group-addon">A</div>
                     <!-- <span class="input-group-btn">
                       <button id="setMode" type="submit" class="btn btn-warning" type="button">
@@ -145,7 +143,7 @@
                 <span class="pull-right clickable panel-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
               </div>
               <div class="panel-b" style="display:none">
-              <table class="panel-table table" id="properties">
+              <table class="panel-table table table-condensed" id="properties">
                 <!-- <thead>
                   <tr><th>Properties</th><th>Properties</th></tr>
                 </thead> -->
@@ -171,12 +169,14 @@
               <h4 class="panel-title">Voltage Sensing</h4>
             </div>
             <div class="panel-body">
+              <div class="text-center">
                 <label class="radio-inline">
                   <input type="radio" name="voltageSensingOption" id="localSensing" value="local" checked> local
                 </label>
                 <label class="radio-inline">
                   <input type="radio" name="voltageSensingOption" id="remoteSensing" value="remote"> remote
                 </label>
+              </div>
             </div>
           </div>
 
