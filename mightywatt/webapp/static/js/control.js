@@ -27,7 +27,7 @@ function setProperties() {
     $("#properties-maxTemperature").text(data.MAX_TEMPERATURE);
     $("#properties-minTemperature").text(data.MIN_TEMPERATURE);
     $("#properties-maxPower").text(data.MAX_POWER);
-    $("#properties-dvmInputResistance").text(data.DVM_INPUT_RESISTANCE);
+    $("#properties-dvmInputResistance").text(data.DVM_INPUT_RESISTANCE/1000. + 'k');
     $("#properties-maxVdac").text(data.maxVdac);
     $("#properties-maxVadc").text(data.maxVadc);
     $("#properties-temperatureThreshold").text(data.temperatureThreshold);
@@ -41,38 +41,83 @@ function updateStatus() {
     // voltage
     $("#voltage").text(data.voltage.toFixed(3));
     if (data.voltage > 0.9 && data.voltage < 26.) {
-        $("#voltageWarning").removeClass('hidden');
-        $("#voltageDanger").addClass('hidden');
-    } else if (data.voltage > 26. ) {
-      $("#voltageWarning").addClass('hidden');
-      $("#voltageDanger").removeClass('hidden');
+      $("#voltageWarning").addClass('label-warning');
+      $("#voltageWarning").removeClass('label-danger');
+      $("#voltageWarning").removeClass('invisible');
+    } else if (data.voltage >= 26. ) {
+      $("#voltageWarning").addClass('label-danger');
+      $("#voltageWarning").removeClass('label-warning');
+      $("#voltageWarning").removeClass('invisible');
     } else {
-      $("#voltageWarning").addClass('hidden');
-      $("#voltageDanger").addClass('hidden');
+      $("#voltageWarning").addClass('invisible');
     }
     // current
     $("#current").text(data.current.toFixed(3));
     if (data.current > 0.01 && data.current < 8.) {
-      $("#currentWarning").removeClass('hidden');
-      $("#currentDanger").addClass('hidden');
-    } else if (data.current > 8.) {
-      $("#currentWarning").addClass('hidden');
-      $("#currentDanger").removeClass('hidden');
+      $("#currentWarning").addClass('label-warning');
+      $("#currentWarning").removeClass('label-danger');
+      $("#currentWarning").removeClass('invisible');
+    } else if (data.current >= 8.) {
+      $("#currentWarning").addClass('label-danger');
+      $("#currentWarning").removeClass('label-warning');
+      $("#currentWarning").removeClass('invisible');
     } else {
-      $("#currentWarning").addClass('hidden');
-      $("#currentDanger").addClass('hidden');
+      $("#currentWarning").addClass('invisible');
+    }
+    // power
+    $("#power").text(data.power.toFixed(3));
+    if (data.power > 0.01 && data.power < 50.) {
+      $("#powerWarning").addClass('label-warning');
+      $("#powerWarning").removeClass('label-danger');
+      $("#powerWarning").removeClass('invisible');
+    } else if (data.power >= 50.) {
+      $("#powerWarning").addClass('label-danger');
+      $("#powerWarning").removeClass('label-warning');
+      $("#powerWarning").removeClass('invisible');
+    } else {
+      $("#powerWarning").addClass('invisible');
+    }
+    // resistance
+    if (data.resistance > 100000)
+      $("#resistance").text('' + data.resistance/1000 + 'k');
+    else if (data.resistance > 1000)
+      $("#resistance").text((data.resistance/1000).toPrecision(4) + 'k');
+    else if (data.resistance < 1.0)
+      $("#resistance").text(data.resistance.toFixed(3));
+    else
+      $("#resistance").text(data.resistance.toPrecision(4));
+    if (data.resistance >= 1.0 && data.resistance < 10000) {
+      $("#resistanceWarning").addClass('label-warning');
+      $("#resistanceWarning").removeClass('label-danger');
+      $("#resistanceWarning").removeClass('invisible');
+    } else if (data.resistance < 1.) {
+      $("#resistanceWarning").addClass('label-danger');
+      $("#resistanceWarning").removeClass('label-warning');
+      $("#resistanceWarning").removeClass('invisible');
+    } else {
+      $("#resistanceWarning").addClass('invisible');
     }
     // temperature
     $("#temperature").text(data.temperature);
     if (data.temperature > 70 && data.temperature < 100) {
-      $("#temperatureWarning").removeClass('hidden');
-      $("#temperatureDanger").addClass('hidden');
+      $("#temperatureWarning").addClass('label-warning');
+      $("#temperatureWarning").removeClass('label-danger');
+      $("#temperatureWarning").removeClass('invisible');
     } else if (data.voltage > 100. ) {
-      $("#temperatureWarning").addClass('hidden');
-      $("#temperatureDanger").removeClass('hidden');
+      $("#temperatureWarning").addClass('label-danger');
+      $("#temperatureWarning").removeClass('label-warning');
+      $("#temperatureWarning").removeClass('invisible');
     } else {
-      $("#temperatureWarning").addClass('hidden');
-      $("#temperatureDanger").addClass('hidden');
+      $("#temperatureWarning").addClass('invisible');
+    }
+    // temperatureThreshold
+    $("#temperatureThreshold").text(data.temperatureThreshold);
+    // remote / local voltage sensing
+    if (data.remoteStatus && $('#localSensing')[0].checked) {
+      if (data.remoteStatus)
+        $('#remoteSensing')[0].checked = true;
+      else
+        $('#localSensing')[0].checked = true;
     }
   })
   .fail(function() { warning('Cannot get status update'); });

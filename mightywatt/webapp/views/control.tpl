@@ -33,42 +33,62 @@
           <h3><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Status</h3>
 
             <div class="panel panel-default">
-              <div class="panel-heading">Current status of the MightyWatt</div>
-              <ul class="list-group">
-                <li class="list-group-item">
-                  Voltage: <span id="voltage">0.000</span> V
-                  <span id="voltageWarning" class="label label-warning hidden">
-                    <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
-                  </span>
-                  <span id="voltageDanger" class="label label-danger hidden">
-                    <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
-                  </span>
-                </li>
-                <li class="list-group-item">
-                  Current: <span id="current">0.000</span> A
-                  <span id="currentWarning" class="label label-warning hidden">
-                    <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
-                  </span>
-                  <span id="currentDanger" class="label label-danger hidden">
-                    <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
-                  </span>
-                </li>
-                <li class="list-group-item">
-                  Temperature: <span id="temperature">-</span> °C
-                  <span id="temperatureWarning" class="label label-warning hidden">
-                    <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
-                  </span>
-                  <span id="temperatureDanger" class="label label-danger hidden">
-                    <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
-                  </span>
-                </li>
-                <li class="list-group-item">
-                  <button id="stop" type="button" class="btn btn-danger">
-                    <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-                    Stop MightyWatt
-                  </button>
-                </li>
-              </ul>
+              <div class="panel-heading"><h4 class="panel-title">Live Monitor of the MightyWatt</h4></div>
+              <table class="panel-table table" id="liveMonitor">
+                <tbody>
+                  <tr>
+                    <td>
+                      Voltage:
+                    </td><td class="numeric-cell">
+                      <span id="voltage">0.000</span> V 
+                      <span id="voltageWarning" class="label invisible">
+                        <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
+                      </span>
+                    </td><td>
+                      Current:
+                    </td><td class="numeric-cell">
+                      <span id="current">0.000</span> A 
+                      <span id="currentWarning" class="label invisible">
+                        <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
+                      </span>
+                    </td>
+                  </tr><tr>
+                    <td>
+                      Power:
+                    </td><td class="numeric-cell">
+                      <span id="power">0.000</span> W 
+                      <span id="powerWarning" class="label invisible">
+                        <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
+                      </span>
+                    </td><td>
+                      Resistance:
+                    </td><td class="numeric-cell">
+                      <span id="resistance">-</span> Ω 
+                      <span id="resistanceWarning" class="label invisible">
+                        <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
+                      </span>
+                    </td>
+                  </tr><tr>
+                    <td colspan="2">
+                      Temperature: <span id="temperature">-</span> °C 
+                      <span id="temperatureWarning" class="label invisible">
+                        <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
+                      </span>
+                    </td><td colspan="2">
+                      (T<sub>Thresh</sub> = <span id="temperatureThreshold">-</span> °C)
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+
+              <div class="panel-body">
+                <button id="stop" type="button" class="btn btn-danger center-block">
+                  <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                  Stop MightyWatt
+                </button>
+              </div>
+
             </div>
 
 
@@ -83,11 +103,13 @@
             </div>
             <div class="panel-body">
               <form>
-                <div class="form-group btn-group" role="group">
-                  <button id="CC" title="Constant Current" type="button" class="btn btn-primary btn-lg active">CC</button>
-                  <button id="CV" title="Constant Voltage" type="button" class="btn btn-primary btn-lg">CV</button>
-                  <button id="CP" title="Constant Power" type="button" class="btn btn-primary btn-lg">CP</button>
-                  <button id="CR" title="Constant Resistance" type="button" class="btn btn-primary btn-lg">CR</button>
+                <div class="text-center">
+                  <div class="form-group btn-group" role="group">
+                    <button id="CC" title="Constant Current" type="button" class="btn btn-primary btn-xl active">CC</button>
+                    <button id="CV" title="Constant Voltage" type="button" class="btn btn-primary btn-xl">CV</button>
+                    <button id="CP" title="Constant Power" type="button" class="btn btn-primary btn-xl">CP</button>
+                    <button id="CR" title="Constant Resistance" type="button" class="btn btn-primary btn-xl">CR</button>
+                  </div>
                 </div>
                 <input id="mode" type="text" class="hidden" value='CC'>
                 <div class="form-group">
@@ -104,7 +126,7 @@
                     </span> -->
                   </div>
                 </div>
-                <button id="setMode" type="submit" class="btn btn-warning">
+                <button id="setMode" type="submit" class="btn btn-warning center-block">
                   <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
                   Set Mode and Value
                 </button>
@@ -131,14 +153,14 @@
                 <tr><td><div>Board Revision: <span id="properties-boardRevision"></span></div></td>
                     <td><div>Firmware: v<span id="properties-fwVersion"></span></div></td></tr>
                 <tr><td><div title="Maximum power that can be dissipated">P<sub>max</sub> = <span id="properties-maxPower"></span> W</div></td>
-                    <td><div title="Threshold temperature at wich the load will shut down">T<sub>Thresh</sub> = <span id="properties-temperatureThreshold"></span> °C</div></td></tr>
+                    <td><div title="Input Resistance of the DVM"> R<sub>max</sub> = <span id="properties-dvmInputResistance"></span> Ω</div></td><td></td></tr>
+                <tr class="hidden"><td><div title="Threshold temperature at wich the load will shut down">T<sub>Thresh</sub> = <span id="properties-temperatureThreshold"></span> °C</div></td></tr>
                 <tr><td><div title="Minimum temperature to set as threshold">T<sub>Thresh,min</sub> = <span id="properties-minTemperature"></span> °C</div></td>
                     <td><div title="Maximum temperature to set as threshold">T<sub>Thresh,max</sub> = <span id="properties-maxTemperature"></span> °C</div></td></tr>
                 <tr><td><div title="Maximum voltage measurable via the ADC">V<sub>ADC,max</sub> = <span id="properties-maxVadc"></span> V</div></td>
                     <td><div title="Maximum voltage settable via the DAC">V<sub>DAC,max</sub> = <span id="properties-maxVdac"></span> V</div></td></tr>
                 <tr><td><div title="Maximum current measureable via the ADC">I<sub>ADC,max</sub> = <span id="properties-maxIadc"></span> A</div></td>
                     <td><div title="Maximum current settable via the DAC">I<sub>DAC,max</sub> = <span id="properties-maxIdac"></span> A</div></td></tr>
-                <tr><td><div title="Input Resistance of the DVM"> R<sub>max</sub> = <span id="properties-dvmInputResistance"></span> Ω</div></td><td></td></tr>
                 </tbody>
               </table>
               </div>
@@ -149,12 +171,12 @@
               <h4 class="panel-title">Voltage Sensing</h4>
             </div>
             <div class="panel-body">
-              <label class="radio-inline">
-                <input type="radio" name="voltageSensingOption" id="localSensing" value="local" checked> local
-              </label>
-              <label class="radio-inline">
-                <input type="radio" name="voltageSensingOption" id="remoteSensing" value="remote"> remote
-              </label>
+                <label class="radio-inline">
+                  <input type="radio" name="voltageSensingOption" id="localSensing" value="local" checked> local
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="voltageSensingOption" id="remoteSensing" value="remote"> remote
+                </label>
             </div>
           </div>
 

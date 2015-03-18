@@ -18,5 +18,19 @@
 }
 
 .panel .table {
-    margin-bottom: 0;
+  margin-bottom: 0;
+}
+
+.numeric-cell {
+  text-align: right;
+  width: 40%;
+}
+
+#liveMonitor td {
+}
+
+.btn-xl {
+    padding: 16px 25px;
+    font-size: 20px;
+    border-radius: 7px;
 }
