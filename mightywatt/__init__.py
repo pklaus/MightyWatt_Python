@@ -176,6 +176,13 @@ class MightyWatt(object):
     def set_local(self, local=True):
         self.set_remote(not local)
 
+    def set_temperature_threshold(self, value):
+        value = int(value)
+        assert value >= self.properties['MIN_TEMPERATURE']
+        assert value <= self.properties['MAX_TEMPERATURE']
+        self._message_queue.put(struct.pack('>BB', MightyWatt.TEMPERATURE_THRESHOLD_ID, value))
+        self.properties['temperatureThreshold'] = value
+
     @property
     def status(self):
         assert self.ms_since_last_update < 1000.0

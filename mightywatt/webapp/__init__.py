@@ -29,6 +29,7 @@ class MightyWattWebServerAPI(Bottle):
         self.route('/mode/cp/<power:float>',      callback=self._set_cp)
         self.route('/mode/cr/<resistance:float>', callback=self._set_cr)
         self.route('/voltage-sensing/<mode>',     callback=self._set_voltage_sensing)
+        self.route('/temperature-threshold/<val:float>', callback=self._set_temperature_threshold)
         self.route('/stop',                       callback=self._stop)
         self.route('/ms_since_last_update',       callback=self._ms_since_last_update)
 
@@ -57,6 +58,10 @@ class MightyWattWebServerAPI(Bottle):
     def _set_voltage_sensing(self, mode):
         assert mode in ['local', 'remote']
         self.mw.set_remote(mode == 'remote')
+        return {'success': True}
+
+    def _set_temperature_threshold(self, val):
+        self.mw.set_temperature_threshold(val)
         return {'success': True}
 
     def _stop(self):
