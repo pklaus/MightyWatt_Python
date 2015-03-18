@@ -82,6 +82,7 @@ use the web server for some reason, you can also simply use the
 MightyWatt object to controll the load programmatically:
 
 ```python
+import time
 from mightywatt import MightyWatt
 
 mw = MightyWatt('/dev/tty.usbmodemfd121')
