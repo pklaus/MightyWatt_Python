@@ -135,8 +135,8 @@
                 <tr><td><div title="Minimum temperature to set as threshold">T<sub>Thresh,min</sub> = <span id="properties-minTemperature"></span> °C</div></td>
                     <td><div title="Maximum temperature to set as threshold">T<sub>Thresh,max</sub> = <span id="properties-maxTemperature"></span> °C</div></td></tr>
                 <tr><td><div title="Maximum voltage measurable via the ADC">V<sub>ADC,max</sub> = <span id="properties-maxVadc"></span> V</div></td>
-                    <td><div title="Maximum current measureable via the ADC">I<sub>ADC,max</sub> = <span id="properties-maxIadc"></span> A</div></td></tr>
-                <tr><td><div title="Maximum voltage settable via the DAC">V<sub>DAC,max</sub> = <span id="properties-maxVdac"></span> V</div></td>
+                    <td><div title="Maximum voltage settable via the DAC">V<sub>DAC,max</sub> = <span id="properties-maxVdac"></span> V</div></td></tr>
+                <tr><td><div title="Maximum current measureable via the ADC">I<sub>ADC,max</sub> = <span id="properties-maxIadc"></span> A</div></td>
                     <td><div title="Maximum current settable via the DAC">I<sub>DAC,max</sub> = <span id="properties-maxIdac"></span> A</div></td></tr>
                 <tr><td><div title="Input Resistance of the DVM"> R<sub>max</sub> = <span id="properties-dvmInputResistance"></span> Ω</div></td><td></td></tr>
                 </tbody>
