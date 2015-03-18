@@ -20,10 +20,6 @@ setup(
     packages = ['mightywatt', 'mightywatt.webapp'],
     scripts = ['scripts/mw_web_server','scripts/mw_web_client','scripts/mw_shell',],
     include_package_data = True,
-    #package_data = {
-    #    'mightywatt': ['webapp/static/*'],
-    #    'mightywatt': ['webapp/views/*'],
-    #},
     install_requires = [
         'Bottle>=0.12',
         'pySerial>=2.6',
