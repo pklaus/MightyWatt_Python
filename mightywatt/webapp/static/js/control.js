@@ -113,7 +113,7 @@ function updateStatus() {
     // temperatureThreshold
     $("#temperatureThreshold").text(data.temperatureThreshold);
     // remote / local voltage sensing
-    if (data.remoteStatus && $('#localSensing')[0].checked) {
+    if (data.remoteStatus != $('#remoteSensing')[0].checked) {
       if (data.remoteStatus)
         $('#remoteSensing')[0].checked = true;
       else
