@@ -40,6 +40,24 @@ To stop the load:
 
     curl http://localhost:8001/api/stop
 
+Controlling the load with the web client
+----------------------------------------
+
+With the web application and its API, you can run scripts
+to script a program for the load. I also included a script
+to do simple tasks such as ramping current etc.:
+
+    mw_web_client \
+      --watchdog 'V>0.5' \
+      --remote \
+      http://localhost:8001 \
+      ramp CC 0 1.3 \
+      --duration 600
+
+This will ramp the current from 0 to 1.3 Amps in 600 seconds.
+It will stop if the voltage drops below 0.5 Volts.
+The Terminal output will look like the log files of the MightyWatt Windows software.
+
 Using the Python module without the web server
 ----------------------------------------------
 
