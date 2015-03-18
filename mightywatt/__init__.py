@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import serial
@@ -251,53 +250,3 @@ except AttributeError:
 
 def three_bytes(value):
     return (value >> 16 & 0xFF, value >> 8 & 0xFF, value & 0xFF)
-
-def main():
-    import argparse
-    parser = argparse.ArgumentParser(description='Mighty Watt tool')
-    parser.add_argument('serial_port', help='The serial port to connect to')
-    parser.add_argument('--verbose', '-v', action='store_true', help='Generate verbose output')
-    args = parser.parse_args()
-    try:
-        try:
-            mw = MightyWatt(args.serial_port, verbose=args.verbose)
-        except MightyWattCommunicationException:
-            parser.error('An error occured, could not establish a connection to the device.')
-        mw.print_status()
-        mw.set_cc(1.00)
-        mw.set_update_rate(100)
-        mw.print_status()
-        time.sleep(0.5)
-        mw.set_cc(1.00)
-        mw.print_status()
-        time.sleep(0.5)
-        mw.print_status()
-        #mw.set_remote()
-        mw.print_status()
-        time.sleep(0.5)
-        mw.print_status()
-        mw.set_cp(2.5)
-        mw.print_status()
-        time.sleep(0.7)
-        mw.print_status()
-        time.sleep(2.5)
-        mw.print_status()
-        mw.set_cv(5.1)
-        mw.print_status()
-        time.sleep(0.7)
-        mw.set_cv(5.1)
-        time.sleep(0.7)
-        mw.print_status()
-        time.sleep(2.5)
-        mw.print_status()
-        mw.close()
-    except KeyboardInterrupt:
-        print("Pressed Ctrl-C. Exiting...")
-    finally:
-        try:
-            mw.close()
-        except:
-            pass
-
-if __name__ == "__main__":
-    main()
