@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from bottle import Bottle, run, view, static_file, TEMPLATE_PATH
+from bottle import Bottle, view, static_file, TEMPLATE_PATH
 import os
 
 # Find out where our resource files are located:
@@ -13,68 +13,70 @@ except:
 
 TEMPLATE_PATH.insert(0, os.path.join(PATH, 'views'))
 
-def run_mwws(mw, *args, **kwargs):
-    """
-    Run the MightyWatt web server
-    First argument is a MightyWatt instance
-    """
-    MW = mw
-    api = Bottle()
-    interface = Bottle()
+class MightyWattWebServerAPI(Bottle):
+    def __init__(self, mw):
+        """
+        the MightyWatt web server
+        First argument is a MightyWatt instance
+        """
+        #Bottle.__init__(self)
+        super(MightyWattWebServerAPI, self).__init__()
+        self.mw = mw
+        self.route('/status',                     callback=self._status)
+        self.route('/mode/cc/<current:float>',    callback=self._set_cc)
+        self.route('/mode/cv/<voltage:float>',    callback=self._set_cv)
+        self.route('/mode/cp/<power:float>',      callback=self._set_cp)
+        self.route('/mode/cr/<resistance:float>', callback=self._set_cr)
+        self.route('/voltage-sensing/<mode>',     callback=self._set_voltage_sensing)
+        self.route('/stop',                       callback=self._stop)
+        self.route('/ms_since_last_update',       callback=self._ms_since_last_update)
 
-    @api.get('/path')
-    def status():
-        return {'path': PATH}
+    def _status(self):
+        return self.mw.status
 
-    @api.get('/ms_since_last_update')
-    def status():
-        return {'ms_since_last_update': MW.ms_since_last_update}
-
-    @api.get('/status')
-    def status():
-        return MW.status
-
-    @api.get('/mode/cc/<current:float>')
-    def set_cc(current):
-        MW.set_cc(current)
+    def _set_cc(self, current):
+        self.mw.set_cc(current)
         return {'success': True}
 
-    @api.get('/mode/cv/<voltage:float>')
-    def set_cv(voltage):
-        MW.set_cv(voltage)
+    def _set_cv(self, voltage):
+        self.mw.set_cv(voltage)
         return {'success': True}
 
-    @api.get('/mode/cp/<power:float>')
-    def set_cp(power):
-        MW.set_cp(power)
+    def _set_cp(self, power):
+        self.mw.set_cp(power)
         return {'success': True}
 
-    @api.get('/mode/cr/<resistance:float>')
-    def set_cr(resistance):
-        MW.set_cr(resistance)
+    def _set_cr(self, resistance):
+        self.mw.set_cr(resistance)
         return {'success': True}
 
-    @api.get('/voltage-sensing/<mode>')
-    def set_voltage_sensing(mode):
+    def _set_voltage_sensing(self, mode):
         assert mode in ['local', 'remote']
-        MW.set_remote(mode == 'remote')
+        self.mw.set_remote(mode == 'remote')
         return {'success': True}
 
-    @api.get('/stop')
-    def stop():
-        MW.stop()
+    def _stop(self):
+        self.mw.stop()
         return {'success': True}
 
-    interface.mount('/api', api)
+    def _ms_since_last_update(self):
+        return {'ms_since_last_update': self.mw.ms_since_last_update}
 
-    @interface.get('/')
+class MightyWattWebServerInterface(Bottle):
+    def __init__(self, mw):
+        """
+        the MightyWatt web server
+        First argument is a MightyWatt instance
+        """
+        super(MightyWattWebServerInterface, self).__init__()
+        self.mount('/api', MightyWattWebServerAPI(mw))
+        self.route('/',                       callback = self._index)
+        self.route('/static/<filename:path>', callback = self._serve_static)
+
     @view('control')
-    def index():
+    def _index(self):
         return {}
 
-    @interface.get('/static/<filename:path>')
-    def serve_static(filename):
+    def _serve_static(self, filename):
         return static_file(filename, root=os.path.join(PATH, 'static'))
-
-    run(interface, *args, **kwargs)
 

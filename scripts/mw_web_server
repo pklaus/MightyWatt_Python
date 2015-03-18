@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from mightywatt import MightyWatt
-from mightywatt.webapp import run_mwws
+from mightywatt.webapp import MightyWattWebServerInterface
 
 def main():
     import argparse
@@ -14,23 +14,24 @@ def main():
     args = parser.parse_args()
     try:
         try:
-            MW = MightyWatt(args.serial_port)
+            mw = MightyWatt(args.serial_port)
         except:
             parser.error("couldn't connect to the device.")
-        MW.set_update_rate(100)
+        mw.set_update_rate(100)
+        mwwsi = MightyWattWebServerInterface(mw)
         if args.debug:
-            run_mwws(MW, host='0.0.0.0', port=args.port, debug=True)
+            mwwsi.run(host='0.0.0.0', port=args.port, debug=True)
         else:
             if args.ipv6:
                 # CherryPy is Python3 ready and has IPv6 support:
-                run_mwws(MW, host='::', server='cherrypy', port=args.port)
+                mwwsi.run(host='::', server='cherrypy', port=args.port)
             else:
-                run_mwws(MW, host='0.0.0.0', server='cherrypy', port=args.port)
+                mwwsi.run(host='0.0.0.0', server='cherrypy', port=args.port)
     except KeyboardInterrupt:
         print('Ctrl-C pressed. Exiting...')
     finally:
         try:
-            MW.close()
+            mw.close()
         except:
             pass
 
