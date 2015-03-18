@@ -14,19 +14,20 @@ Installing this Python package is as simple as:
 Starting the web server
 -----------------------
 
-Adapt the COM port of your MightyWatt hardware:
+Here is how you start the web server, just adapt
+to the name of the serial port of your MightyWatt hardware:
 
     mw_web_server /dev/ttyACM0
 
-This will start a web server at <http://localhost:8001>.
-The web page will look like this:
+The web server will then be available at <http://localhost:8001>
+and the web page will look like this:
 
 ![screenshot of the web interface](./docs/web-screenshot.png)
 
-You can stop the web server with Ctrl-C. (This might take a few seconds.)
+You can stop the web server by pressing `[Ctrl]-[C]`. (This might take a few seconds.)
 
-The web server comes with the user interface shown above but it also provides
-an API to control the MightyWatt with simple HTTP request:
+The web server comes with the user interface shown above but it **also provides
+an API** to control the MightyWatt with simple HTTP request:
 
 To set constant current mode with 1.0 Amps:
 
@@ -43,9 +44,8 @@ To stop the load:
 Controlling the load with the web client
 ----------------------------------------
 
-With the web application and its API, you can run scripts
-to script a program for the load. I also included a script
-to do simple tasks such as ramping current etc.:
+You can use the web server API to script a program for the load.
+This software already comes with a a script to do simple tasks such as ramping current etc.:
 
     mw_web_client \
       --watchdog 'V>0.5' \
@@ -55,8 +55,20 @@ to do simple tasks such as ramping current etc.:
       --duration 600
 
 This will ramp the current from 0 to 1.3 Amps in 600 seconds.
-It will stop if the voltage drops below 0.5 Volts.
-The Terminal output will look like the log files of the MightyWatt Windows software.
+It will use the remote sensing feature and stop if the voltage drops below 0.5 Volts.
+The output of the script to stdout looks like the log files of the MightyWatt Windows software:
+
+    MightyWatt Log File
+    Started on	15/03/2015	08:54:10 PM
+    Current [A]	Voltage [V]	Time since start [s]	Temperature [deg C]
+    0.000	4.864	0.000	21
+    0.000	4.860	0.098	21
+    0.000	4.864	0.196	21
+    0.000	4.860	0.295	21
+    0.000	4.867	0.393	21
+    0.000	4.862	0.491	21
+    0.000	4.868	0.590	21
+    [...]
 
 Using the Python module without the web server
 ----------------------------------------------
@@ -66,40 +78,24 @@ use the web server for some reason, you can also simply use the
 MightyWatt object to controll the load programmatically:
 
 ```python
-def main():
-    import argparse
-    parser = argparse.ArgumentParser(description='Mighty Watt tool')
-    parser.add_argument('serial_port', help='The serial port to connect to')
-    parser.add_argument('--verbose', '-v', action='store_true', help='Generate verbose output')
-    args = parser.parse_args()
-    try:
-        try:
-            mw = MightyWatt(args.serial_port, verbose=args.verbose)
-        except MightyWattCommunicationException:
-            parser.error('An error occured, could not establish a connection to the device.')
-        mw.print_status()
-        mw.set_cc(1.00)
-        mw.print_status()
-        mw.set_update_rate(100)
-        time.sleep(0.5)
-        mw.print_status()
-        time.sleep(0.5)
-        mw.print_status()
-        #mw.set_remote()
-        mw.print_status()
-        mw.set_cp(2.5)
-        mw.print_status()
-        mw.close()
-    except KeyboardInterrupt:
-        print("Pressed Ctrl-C. Exiting...")
-    finally:
-        try:
-            mw.close()
-        except:
-            pass
+from mightywatt import MightyWatt
 
-if __name__ == "__main__":
-    main()
+mw = MightyWatt('/dev/tty.usbmodemfd121')
+mw.print_status()
+mw.set_cc(1.00)
+mw.print_status()
+mw.set_update_rate(100)
+time.sleep(0.5)
+mw.print_status()
+time.sleep(0.5)
+mw.print_status()
+#mw.set_remote()
+mw.print_status()
+mw.set_cp(2.5)
+mw.print_status()
+mw.stop()
+mw.close()
 ```
 
 [MightyWatt]: http://kaktuscircuits.blogspot.cz/2014/07/mightywatt-revison-2-now-50-mightier.html
+
