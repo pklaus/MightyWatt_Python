@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from mw import MightyWatt
+from mightywatt import MightyWatt
 import cmd
 from blessings import Terminal
 

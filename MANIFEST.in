@@ -1,0 +1,2 @@
+recursive-include mightywatt/webapp/views *
+recursive-include mightywatt/webapp/static *

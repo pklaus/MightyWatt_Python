@@ -1,16 +1,31 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from mw import MightyWatt
-from bottle import Bottle, run, view, static_file
+from mightywatt import MightyWatt
+from bottle import Bottle, run, view, static_file, TEMPLATE_PATH
+import os
+
+# Find out where our resource files are located:
+try:
+    from pkg_resources import resource_filename, Requirement
+    PATH = resource_filename("mightywatt", "webapp")
+    #PATH = resource_filename(Requirement.parse("mightywatt"), "webapp")
+except:
+    PATH = './'
+
+TEMPLATE_PATH.insert(0, os.path.join(PATH, 'views'))
 
 MW = None
 
 api = Bottle()
 
-@api.get('/mw_since_last_update')
+@api.get('/path')
 def status():
-    return {'mw_since_last_update': MW.mw_since_last_update}
+    return {'path': PATH}
+
+@api.get('/ms_since_last_update')
+def status():
+    return {'ms_since_last_update': MW.ms_since_last_update}
 
 @api.get('/status')
 def status():
@@ -57,7 +72,7 @@ def index():
 
 @interface.get('/static/<filename:path>')
 def serve_static(filename):
-    return static_file(filename, root='./static/')
+    return static_file(filename, root=os.path.join(PATH, 'static'))
 
 def main():
     global MW
