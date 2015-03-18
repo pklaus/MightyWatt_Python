@@ -17,8 +17,8 @@ setup(
     description = __doc__,
     long_description = __doc__,
     license = 'GPL',
-    packages = ['mightywatt'],
-    scripts = ['mightywatt/webapp/mw_web_server','scripts/mw_web_client','scripts/mw_shell',],
+    packages = ['mightywatt', 'mightywatt.webapp'],
+    scripts = ['scripts/mw_web_server','scripts/mw_web_client','scripts/mw_shell',],
     include_package_data = True,
     #package_data = {
     #    'mightywatt': ['webapp/static/*'],
