@@ -50,7 +50,7 @@ class MightyWatt(object):
     REMOTE_ID = 5 | 0x80 | (1 << 5)
 
     identity = None
-    props = None
+    properties = None
     _status = None
     _update_rate = 10
     _message_size = 0
@@ -113,7 +113,7 @@ class MightyWatt(object):
             raise MightyWattCommunicationException()
 
     def _read_properties(self):
-        while not self.props and self._qdc_tries > 0:
+        while not self.properties and self._qdc_tries > 0:
             response = []
             try:
                 self._write(MightyWatt.QDC_q)
@@ -123,7 +123,7 @@ class MightyWatt(object):
                 for i in range(len(MightyWatt.QDC_r)):
                     value = MightyWatt.QDC_r[i][1](response[i])
                     props[MightyWatt.QDC_r[i][0]] = value
-                self.props = props
+                self.properties = props
                 return
             except (AssertionError, ValueError):
                 if self.verbose: print("Not a valid QDC response: " + str(response))
@@ -134,7 +134,7 @@ class MightyWatt(object):
     def print_device_summary(self):
         print("Connected to a MightyWatt on port {}".format(self.port))
         print("Properties:")
-        pprint(self.props)
+        pprint(self.properties)
 
     def _update(self):
         try:
@@ -192,7 +192,7 @@ class MightyWatt(object):
         if status['current'] != 0.0:
             status['resistance'] = status['voltage'] / status['current']
         else:
-            status['resistance'] = self.props['DVM_INPUT_RESISTANCE']
+            status['resistance'] = self.properties['DVM_INPUT_RESISTANCE']
         status['time'] = clock() - self._start
         self._status = status
 
