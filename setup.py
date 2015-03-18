@@ -4,6 +4,10 @@
 """
 A Python package with a web interface for the MightyWatt,
 a great programmable electronic load for the Arduino Uno/Due.
+
+The MightyWatt is an Arduino shield designed as a constant-current /
+constant-voltage load. It uses a FET in linear mode to create an
+adjustable resistance.
 """
 
 from setuptools import setup
