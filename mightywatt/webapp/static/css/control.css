@@ -4,7 +4,19 @@
   .jumbotron {
     background-image: url("/static/images/MightyWatt_wide_small-gray.jpg");
     background-repeat: no-repeat;
-    background-position: right; 
+    background-position: right;
   }
 
+}
+
+.panel-heading span {
+  margin-top: -18px;
+  font-size: 15px;
+}
+.clickable {
+  cursor: pointer;
+}
+
+.panel .table {
+    margin-bottom: 0;
 }

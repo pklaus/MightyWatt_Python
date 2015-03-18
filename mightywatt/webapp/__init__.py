@@ -23,6 +23,7 @@ class MightyWattWebServerAPI(Bottle):
         super(MightyWattWebServerAPI, self).__init__()
         self.mw = mw
         self.route('/status',                     callback=self._status)
+        self.route('/properties',                 callback=self._properties)
         self.route('/mode/cc/<current:float>',    callback=self._set_cc)
         self.route('/mode/cv/<voltage:float>',    callback=self._set_cv)
         self.route('/mode/cp/<power:float>',      callback=self._set_cp)
@@ -33,6 +34,9 @@ class MightyWattWebServerAPI(Bottle):
 
     def _status(self):
         return self.mw.status
+
+    def _properties(self):
+        return self.mw.properties
 
     def _set_cc(self, current):
         self.mw.set_cc(current)

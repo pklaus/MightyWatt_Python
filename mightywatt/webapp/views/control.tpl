@@ -54,7 +54,7 @@
                   </span>
                 </li>
                 <li class="list-group-item">
-                  Temperature: <span id="temperature">-</span> ℃ 
+                  Temperature: <span id="temperature">-</span> °C
                   <span id="temperatureWarning" class="label label-warning hidden">
                     <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
                   </span>
@@ -116,6 +116,33 @@
 
         <div class="col-md-4">
           <h3><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Settings and Tools</h3>
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Device Properties</h3>
+                <span class="pull-right clickable panel-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+              </div>
+              <div class="panel-b" style="display:none">
+              <table class="panel-table table" id="properties">
+                <!-- <thead>
+                  <tr><th>Properties</th><th>Properties</th></tr>
+                </thead> -->
+                <tbody>
+                <tr><td><div>Board Revision: <span id="properties-boardRevision"></span></div></td>
+                    <td><div>Firmware: v<span id="properties-fwVersion"></span></div></td></tr>
+                <tr><td><div title="Maximum power that can be dissipated">P<sub>max</sub> = <span id="properties-maxPower"></span> W</div></td>
+                    <td><div title="Threshold temperature at wich the load will shut down">T<sub>Thresh</sub> = <span id="properties-temperatureThreshold"></span> °C</div></td></tr>
+                <tr><td><div title="Minimum temperature to set as threshold">T<sub>Thresh,min</sub> = <span id="properties-minTemperature"></span> °C</div></td>
+                    <td><div title="Maximum temperature to set as threshold">T<sub>Thresh,max</sub> = <span id="properties-maxTemperature"></span> °C</div></td></tr>
+                <tr><td><div title="Maximum voltage measurable via the ADC">V<sub>ADC,max</sub> = <span id="properties-maxVadc"></span> V</div></td>
+                    <td><div title="Maximum current measureable via the ADC">I<sub>ADC,max</sub> = <span id="properties-maxIadc"></span> A</div></td></tr>
+                <tr><td><div title="Maximum voltage settable via the DAC">V<sub>DAC,max</sub> = <span id="properties-maxVdac"></span> V</div></td>
+                    <td><div title="Maximum current settable via the DAC">I<sub>DAC,max</sub> = <span id="properties-maxIdac"></span> A</div></td></tr>
+                <tr><td><div title="Input Resistance of the DVM"> R<sub>max</sub> = <span id="properties-dvmInputResistance"></span> Ω</div></td><td></td></tr>
+                </tbody>
+              </table>
+              </div>
+            </div>
 
           <div class="panel panel-default">
             <div class="panel-heading">

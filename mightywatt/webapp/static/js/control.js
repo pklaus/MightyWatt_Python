@@ -18,6 +18,23 @@ function resetWarning() {
   $('#warning').remove();
 }
 
+function setProperties() {
+  $.getJSON("/api/properties", function( data ) {
+    $("#properties-maxIdac").text(data.maxIdac);
+    $("#properties-boardRevision").text(data.BOARD_REVISION);
+    $("#properties-fwVersion").text(data.FW_VERSION);
+    $("#properties-maxIadc").text(data.maxIadc);
+    $("#properties-maxTemperature").text(data.MAX_TEMPERATURE);
+    $("#properties-minTemperature").text(data.MIN_TEMPERATURE);
+    $("#properties-maxPower").text(data.MAX_POWER);
+    $("#properties-dvmInputResistance").text(data.DVM_INPUT_RESISTANCE);
+    $("#properties-maxVdac").text(data.maxVdac);
+    $("#properties-maxVadc").text(data.maxVadc);
+    $("#properties-temperatureThreshold").text(data.temperatureThreshold);
+  })
+  .fail(function() { warning('Cannot get device properties'); });
+}
+
 function updateStatus() {
   $.getJSON("/api/status", function( data ) {
     resetWarning();
@@ -77,6 +94,25 @@ $(function() {
   setTimeout(function() {
     timedUpdate();
   }, 200);
+
+  setProperties();
+});
+
+$(function ($) {
+  $('.panel-heading span.clickable').on("click", function (e) {
+    if ($(this).hasClass('panel-collapsed')) {
+      // expand the panel
+      $(this).parents('.panel').find('.panel-b').slideDown();
+      $(this).removeClass('panel-collapsed');
+      $(this).find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+    }
+    else {
+      // collapse the panel
+      $(this).parents('.panel').find('.panel-b').slideUp();
+      $(this).addClass('panel-collapsed');
+      $(this).find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+    }
+  });
 });
 
 function timedUpdate() {

@@ -14,8 +14,8 @@ class MightyWatt(object):
     IDN_r = "Mighty Watt"  # expected identify answer
     QDC_q = b"\x1E"        # query command byte
     QDC_r = [              # meaning of the answer lines
-        ('FW_VERSION', str),
-        ('BOARD_REVISION', str),
+        ('FW_VERSION', str.strip),
+        ('BOARD_REVISION', str.strip),
         ('maxIdac', lambda x: int(x)/1000.),
         ('maxIadc', lambda x: int(x)/1000.),
         ('maxVdac', lambda x: int(x)/1000.),
