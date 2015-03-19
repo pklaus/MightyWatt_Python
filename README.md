@@ -1,5 +1,4 @@
-MightyWatt powered by Python
-============================
+## MightyWatt powered by Python
 
 This is a Python package with a web interface for the [MightyWatt][],
 a great programmable electronic load for the Arduino Uno/Due.
@@ -8,15 +7,13 @@ The [MightyWatt][] is an Arduino shield designed as a constant-current /
 constant-voltage load. It uses a FET in linear mode to create an
 adjustable resistance.
 
-Installation
-------------
+### Installation
 
 Installing this Python package is as simple as:
 
     pip install https://github.com/pklaus/MightyWatt_Python/archive/master.zip
 
-Starting the web server
------------------------
+### Starting the web server
 
 Here is how you start the web server, just adapt
 to the name of the serial port of your MightyWatt hardware:
@@ -45,8 +42,7 @@ To stop the load:
 
     curl http://localhost:8001/api/stop
 
-Controlling the load with the web client
-----------------------------------------
+### Controlling the load with the web client
 
 You can use the web server API to script a program for the load.
 This software already comes with a a script to do simple tasks such as ramping current etc.:
@@ -74,8 +70,7 @@ The output of the script to stdout looks like the log files of the MightyWatt Wi
     0.000	4.868	0.590	21
     [...]
 
-Using the Python module without the web server
-----------------------------------------------
+### Using the Python module without the web server
 
 If you want to create scripts using the MightyWatt and don't want to
 use the web server for some reason, you can also simply use the
