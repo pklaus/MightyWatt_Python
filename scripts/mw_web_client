@@ -117,11 +117,12 @@ def main():
         period = 1/args.freq
         if args.remote: mwwc.set_remote()
         if args.local: mwwc.set_local()
+        time.sleep(0.01)
         header()
         start = clock()
         last = clock() - period
         mw_rel_time = mwwc.status['time']
-        flush_period = 5.0
+        flush_period = 30.0
         last_flush = clock()
         while (clock() - start) <= args.duration:
             wait_time = period - (clock() - last)
