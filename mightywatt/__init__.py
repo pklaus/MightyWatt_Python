@@ -5,7 +5,10 @@ import struct
 import time
 from pprint import pprint
 import threading
-import queue
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
 
 class MightyWatt(object):
 
@@ -14,8 +17,8 @@ class MightyWatt(object):
     IDN_r = "Mighty Watt"  # expected identify answer
     QDC_q = b"\x1E"        # query command byte
     QDC_r = [              # meaning of the answer lines
-        ('FW_VERSION', str.strip),
-        ('BOARD_REVISION', str.strip),
+        ('FW_VERSION', str),
+        ('BOARD_REVISION', str),
         ('maxIdac', lambda x: int(x)/1000.),
         ('maxIadc', lambda x: int(x)/1000.),
         ('maxVdac', lambda x: int(x)/1000.),
@@ -63,12 +66,12 @@ class MightyWatt(object):
         self.port = port
         self.verbose = verbose
         self._message_size = struct.calcsize(MightyWatt.UPD_fmt)
-        self._message_queue = queue.Queue()
+        self._message_queue = Queue()
         self._start = clock()
         self._connect()
         self._update()
         if self.verbose: self.print_device_summary()
-        self._timer = PerpetualTimer(1/self._update_rate, self._update)
+        self._timer = PerpetualTimer(1./self._update_rate, self._update)
         self._timer.start()
 
     def _connect(self):
@@ -85,8 +88,8 @@ class MightyWatt(object):
             try:
                 self._write(MightyWatt.IDN_q)
                 answer = self._readline()
-                assert answer == MightyWatt.IDN_r + MightyWatt.LE, "strange answer: " + answer
-                self.identity = answer.strip()
+                assert answer == MightyWatt.IDN_r, "strange answer: " + answer
+                self.identity = answer
                 return
             except AssertionError:
                 if self.verbose: print('Not a valid IDN response: ' + str(answer))
@@ -108,7 +111,11 @@ class MightyWatt(object):
 
     def _readline(self):
         try:
-            return self._c.readline().decode('ascii')
+            line = self._c.readline()
+            if type(line) == str:
+                return line.strip()
+            if type(line) == bytes:
+                return line.decode('ascii').strip()
         except (OSError, serial.serialutil.SerialException):
             raise MightyWattCommunicationException()
 
@@ -148,9 +155,9 @@ class MightyWatt(object):
         self._set_status(response)
 
     def set_update_rate(self, rate):
-        assert (rate > 1.2) and (1/rate >= self._min_update_interval)
+        assert (rate > 1.2) and (1./rate >= self._min_update_interval)
         self._update_rate = rate
-        self._timer.wait_time = 1/self._update_rate
+        self._timer.wait_time = 1./self._update_rate
 
     def set_cc(self, current):
         current = int(round(current*1000.))
