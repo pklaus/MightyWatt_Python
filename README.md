@@ -99,7 +99,10 @@ mw.close()
 
 ### Requirements
 
-This Python software requires these external dependencies:
+This software requires [Python](https://www.python.org/) to run.
+It is written for Python 3.4 but should also run on 2.7 (not tested as much though!).
+
+In addition it requires these external dependencies:
 
 * [pySerial](http://pyserial.sourceforge.net/)
 * [Bottle](http://bottlepy.org)
