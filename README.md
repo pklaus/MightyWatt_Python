@@ -107,7 +107,7 @@ In addition it requires these external dependencies:
 * [pySerial](http://pyserial.sourceforge.net/)
 * [Bottle](http://bottlepy.org)
 
-Both should be automatically fetched and installed from PyPI.
+Both should be automatically fetched and installed from [the Python Package Index](https://pypi.python.org/pypi).
 
 ### Author
 
