@@ -17,7 +17,7 @@ setup(
     author = 'Philipp Klaus',
     author_email = 'philipp.l.klaus@web.de',
     url = "http://github.com/pklaus/MightyWatt_Python/",
-    version = '0.8',
+    version = '0.9',
     description = __doc__,
     long_description = __doc__,
     license = 'GPL',
