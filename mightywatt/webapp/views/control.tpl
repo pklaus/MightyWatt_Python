@@ -100,7 +100,7 @@
               <h4 class="panel-title">Mode of Operation</h4>
             </div>
             <div class="panel-body">
-              <form>
+              <form id="operationMode">
                 <div class="text-center">
                   <div class="form-group btn-group" role="group">
                     <button id="CC" title="Constant Current" type="button" class="btn btn-primary btn-xl active">CC</button>
@@ -164,22 +164,44 @@
               </div>
             </div>
 
+
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h4 class="panel-title">Voltage Sensing</h4>
+              <h4 class="panel-title">Settings</h4>
             </div>
             <div class="panel-body">
-              <div class="text-center">
-                <label class="radio-inline">
-                  <input type="radio" name="voltageSensingOption" id="localSensing" value="local" checked> local
-                </label>
-                <label class="radio-inline">
-                  <input type="radio" name="voltageSensingOption" id="remoteSensing" value="remote"> remote
-                </label>
-              </div>
+              <form id="setting" class="form-horizontal">
+                <div class="form-group">
+                  <label for="voltageSensingOption" class="col-sm-5 control-label">Voltage Sensing</label>
+                  <div class="col-sm-6">
+                    <label class="radio-inline">
+                      <input type="radio" name="voltageSensingOption" id="localSensing" value="local" checked> local
+                    </label>
+                    <label class="radio-inline">
+                      <input type="radio" name="voltageSensingOption" id="remoteSensing" value="remote"> remote
+                    </label>
+                  </div>
+                </div> <!-- /form-group -->
+                <div class="form-group" title="The threshold temperature">
+                  <label for="threshold" class="col-sm-5 control-label">T<sub>Thresh</sub></label>
+                  <div class="col-sm-6">
+                    <div class="input-group">
+                      <!-- <label for="threshold">Threshold: </label> -->
+                      <input id="threshold" type="number" min="70" max="110" step="1" class="form-control" placeholder="70" size="3">
+                      <span class="input-group-btn">
+                        <button id="thresholdMinus" class="btn btn-default" type="button" aria-label="Minus">
+                          <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                        </button>
+                        <button id="thresholdPlus" class="btn btn-default" type="button" aria-label="Plus">
+                          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        </button>
+                      </span>
+                    </div><!-- /input-group -->
+                  </div><!-- /col -->
+                </div><!-- /form-group -->
+              </form>
             </div>
           </div>
-
 
 
         </div>
