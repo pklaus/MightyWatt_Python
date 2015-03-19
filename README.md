@@ -97,5 +97,21 @@ mw.stop()
 mw.close()
 ```
 
+### Requirements
+
+This Python software requires these external dependencies:
+
+* [pySerial](http://pyserial.sourceforge.net/)
+* [Bottle](http://bottlepy.org)
+
+Both should be automatically fetched and installed from PyPI.
+
+### Author
+
+* The MightyWatt is an open hardware/open software product
+  developed by Jakub Polonský, available for sale
+  at [Tindie](https://www.tindie.com/products/Kaktus/mightywatt-kit-70-watt-electronic-load-for-arduino/).
+* This software was written by Philipp Klaus.
+
 [MightyWatt]: http://kaktuscircuits.blogspot.cz/2014/07/mightywatt-revison-2-now-50-mightier.html
 
