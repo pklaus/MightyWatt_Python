@@ -40,9 +40,9 @@ class MightyWattWebClient(object):
         return json.loads(data.decode('utf-8'))
 
 def header():
-    sys.stdout.write("MightyWatt Log File\n")
-    sys.stdout.write(dt.now().strftime('Started on\t%d/%m/%Y\t%I:%M:%S %p\n'))
-    sys.stdout.write("Current [A]	Voltage [V]	Time since start [s]	Temperature [deg C]\n")
+    sys.stdout.write("# MightyWatt Log File\n")
+    sys.stdout.write(dt.now().strftime('# Started on\t%m/%d/%Y\t%I:%M:%S %p\n'))
+    sys.stdout.write("# Current [A]\tVoltage [V]\tTime since start [s]\tTemperature [deg C]\tLocal[l]/Remote[r]\n")
 
 def watchdog_parser(input_string):
     conditions=[]
@@ -133,7 +133,8 @@ def main():
                 mwwc.set_mode(args.mode, new_value)
             status = mwwc.status
             status['time'] -= mw_rel_time
-            sys.stdout.write("{current:.3f}\t{voltage:.3f}\t{time:.3f}\t{temperature:d}\n".format(**status))
+            status['local_remote'] = 'r' if status['remote'] else 'l'
+            sys.stdout.write("{current:.3f}\t{voltage:.3f}\t{time:.3f}\t{temperature:d}\t{local_remote}\n".format(**status))
             if clock() - last_flush > flush_period:
                 last_flush = clock()
                 sys.stdout.flush()

@@ -14,7 +14,7 @@ class MightyWatt(object):
 
     LE = "\r\n"            # line ending
     IDN_q = b"\x1F"        # identify query byte
-    IDN_r = "Mighty Watt"  # expected identify answer
+    IDN_r = "MightyWatt"  # expected identify answer
     QDC_q = b"\x1E"        # query command byte
     QDC_r = [              # meaning of the answer lines
         ('FW_VERSION', str),
@@ -26,8 +26,6 @@ class MightyWatt(object):
         ('MAX_POWER', lambda p: int(p)/1000.),
         ('DVM_INPUT_RESISTANCE', int),
         ('temperatureThreshold', int),
-        ('MAX_TEMPERATURE', int),
-        ('MIN_TEMPERATURE', int),
     ]
     STATUS = {
         0: 'READY',
@@ -36,21 +34,20 @@ class MightyWatt(object):
         4: 'POWER_OVERLOAD',
         8: 'OVERHEAT'
     }
-    UPD_fmt = '>HHBBBB'
+    UPD_fmt = '>HHBBB'
     UPD_r = [              # update response
         ('current', lambda i: i/1000.),
         ('voltage', lambda v: v/1000.),
         ('temperature', int),
-        ('temperatureThreshold', int),
         ('remoteStatus', lambda rs: bool(rs & 0x01)),
-        ('currentStatus', lambda x: x)
+        ('loadStatus', lambda x: x)
     ]
+    #          cmd   r/w    length
     MODE_CC =   0 | 0x80 | (2 << 5)
     MODE_CV =   1 | 0x80 | (2 << 5)
     MODE_CP =   2 | 0x80 | (3 << 5)
     MODE_CR =   3 | 0x80 | (3 << 5)
-    TEMPERATURE_THRESHOLD_ID = 4 | 0x80 | (1 << 5)
-    REMOTE_ID = 5 | 0x80 | (1 << 5)
+    REMOTE_ID = 4 | 0x80 | (1 << 5)
 
     identity = None
     properties = None
@@ -182,13 +179,6 @@ class MightyWatt(object):
 
     def set_local(self, local=True):
         self.set_remote(not local)
-
-    def set_temperature_threshold(self, value):
-        value = int(value)
-        assert value >= self.properties['MIN_TEMPERATURE']
-        assert value <= self.properties['MAX_TEMPERATURE']
-        self._message_queue.put(struct.pack('>BB', MightyWatt.TEMPERATURE_THRESHOLD_ID, value))
-        self.properties['temperatureThreshold'] = value
 
     @property
     def status(self):

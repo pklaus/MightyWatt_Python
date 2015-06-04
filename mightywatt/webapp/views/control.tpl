@@ -151,14 +151,12 @@
                 <tr><td><div>Board Revision: <span id="properties-boardRevision"></span></div></td>
                     <td><div>Firmware: v<span id="properties-fwVersion"></span></div></td></tr>
                 <tr><td><div title="Maximum power that can be dissipated">P<sub>max</sub> = <span id="properties-maxPower"></span> W</div></td>
-                    <td><div title="Input Resistance of the DVM"> R<sub>max</sub> = <span id="properties-dvmInputResistance"></span> Ω</div></td><td></td></tr>
-                <tr class="hidden"><td><div title="Threshold temperature at wich the load will shut down">T<sub>Thresh</sub> = <span id="properties-temperatureThreshold"></span> °C</div></td></tr>
-                <tr><td><div title="Minimum temperature to set as threshold">T<sub>Thresh,min</sub> = <span id="properties-minTemperature"></span> °C</div></td>
-                    <td><div title="Maximum temperature to set as threshold">T<sub>Thresh,max</sub> = <span id="properties-maxTemperature"></span> °C</div></td></tr>
+                    <td><div title="Input Resistance of the DVM"> R<sub>max</sub> = <span id="properties-dvmInputResistance"></span> Ω</div></td></tr>
                 <tr><td><div title="Maximum voltage measurable via the ADC">V<sub>ADC,max</sub> = <span id="properties-maxVadc"></span> V</div></td>
                     <td><div title="Maximum voltage settable via the DAC">V<sub>DAC,max</sub> = <span id="properties-maxVdac"></span> V</div></td></tr>
                 <tr><td><div title="Maximum current measureable via the ADC">I<sub>ADC,max</sub> = <span id="properties-maxIadc"></span> A</div></td>
                     <td><div title="Maximum current settable via the DAC">I<sub>DAC,max</sub> = <span id="properties-maxIdac"></span> A</div></td></tr>
+                <tr><td colspan="2"><div title="Threshold temperature at wich the load will shut down">T<sub>Thresh</sub> = <span id="properties-temperatureThreshold"></span> °C</div></td></tr>
                 </tbody>
               </table>
               </div>
@@ -182,23 +180,6 @@
                     </label>
                   </div>
                 </div> <!-- /form-group -->
-                <div class="form-group" title="The threshold temperature">
-                  <label for="threshold" class="col-sm-5 control-label">T<sub>Thresh</sub></label>
-                  <div class="col-sm-6">
-                    <div class="input-group">
-                      <!-- <label for="threshold">Threshold: </label> -->
-                      <input id="threshold" type="number" min="70" max="110" step="1" class="form-control" placeholder="70" size="3">
-                      <span class="input-group-btn">
-                        <button id="thresholdMinus" class="btn btn-default" type="button" aria-label="Minus">
-                          <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-                        </button>
-                        <button id="thresholdPlus" class="btn btn-default" type="button" aria-label="Plus">
-                          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                        </button>
-                      </span>
-                    </div><!-- /input-group -->
-                  </div><!-- /col -->
-                </div><!-- /form-group -->
               </form>
             </div>
           </div>

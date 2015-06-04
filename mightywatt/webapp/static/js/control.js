@@ -30,7 +30,9 @@ function setProperties() {
     $("#properties-dvmInputResistance").text(data.DVM_INPUT_RESISTANCE/1000. + 'k');
     $("#properties-maxVdac").text(data.maxVdac);
     $("#properties-maxVadc").text(data.maxVadc);
+    // temperatureThreshold
     $("#properties-temperatureThreshold").text(data.temperatureThreshold);
+    $("#temperatureThreshold").text(data.temperatureThreshold);
   })
   .fail(function() { warning('Cannot get device properties'); });
 }
@@ -110,10 +112,6 @@ function updateStatus() {
     } else {
       $("#temperatureWarning").addClass('invisible');
     }
-    // temperatureThreshold
-    $("#temperatureThreshold").text(data.temperatureThreshold);
-    if (! $("#threshold").is(":focus"))
-      $("#threshold").val(data.temperatureThreshold);
     // remote / local voltage sensing
     if (data.remoteStatus != $('#remoteSensing')[0].checked) {
       if (data.remoteStatus)
@@ -211,29 +209,6 @@ function change_mode(mode) {
 }
 
 
-function sendNewThreshold(by) {
-  var value = $('#threshold').val();
-  $.getJSON("/api/temperature-threshold/" + value);
-}
-function changeThreshold(by) {
-  $('#threshold').val(by + parseInt($('#threshold').val()));
-  sendNewThreshold();
-}
-$('#thresholdMinus').on('click', function (e) {
-  changeThreshold(-1);
-});
-$('#thresholdPlus').on('click', function (e) {
-  changeThreshold(+1);
-});
-
-//$('#threshold').on('input', function() {
-$('#threshold').blur(function() {
-  sendNewThreshold();
-});
-$('form#setting').on('submit', function(e) {
-  sendNewThreshold();
-  e.preventDefault();
-});
 //$('#setMode').on('click', function (e) {
 $('form#operationMode').on('submit', function(e) {
   var mode = $('#mode').val().toLowerCase();

@@ -2,16 +2,17 @@
 
 This is a Python package with a web interface for the [MightyWatt][],
 a great programmable electronic load for the Arduino Uno/Due.
-
-The [MightyWatt][] is an Arduino shield designed as a constant-current /
-constant-voltage load. It uses a FET in linear mode to create an
-adjustable resistance.
+Designed as an Arduino shield it is made to be operated in
+as a constant-current or constant-voltage mode.
+In addition, a constant-power and constant-resistance mode are
+implemented in software on the Arduino.
+It uses a FET in linear mode to dissipate the power.
 
 ### Installation
 
 Installing this Python package is as simple as:
 
-    pip install https://github.com/pklaus/MightyWatt_Python/archive/master.zip
+    pip install --upgrade https://github.com/pklaus/MightyWatt_Python/archive/master.zip
 
 ### Starting the web server
 
@@ -28,7 +29,7 @@ and the web page will look like this:
 You can stop the web server by pressing `[Ctrl]-[C]`. (This might take a few seconds.)
 
 The web server comes with the user interface shown above but it **also provides
-an API** to control the MightyWatt with simple HTTP request:
+an API** to control the MightyWatt with simple HTTP requests:
 
 To set constant current mode with 1.0 Amps:
 
@@ -58,23 +59,22 @@ This will ramp the current from 0 to 1.3 Amps in 600 seconds.
 It will use the remote sensing feature and stop if the voltage drops below 0.5 Volts.
 The output of the script to stdout looks like the log files of the MightyWatt Windows software:
 
-    MightyWatt Log File
-    Started on	15/03/2015	08:54:10 PM
-    Current [A]	Voltage [V]	Time since start [s]	Temperature [deg C]
-    0.000	4.864	0.000	21
-    0.000	4.860	0.098	21
-    0.000	4.864	0.196	21
-    0.000	4.860	0.295	21
-    0.000	4.867	0.393	21
-    0.000	4.862	0.491	21
-    0.000	4.868	0.590	21
+    # MightyWatt Log File
+    # Started on	06/04/2015	11:51:39 AM
+    # Current [A]	Voltage [V]	Time since start [s]	Temperature [deg C]	Local[l]/Remote[r]
+    0.000	3.153	0.000	24	r
+    0.000	3.159	0.107	24	r
+    0.000	3.155	0.209	24	r
+    0.000	3.157	0.303	24	r
+    0.000	3.159	0.410	24	r
+    0.000	3.160	0.508	24	r
     [...]
 
 ### Using the Python module without the web server
 
 If you want to create scripts using the MightyWatt and don't want to
 use the web server for some reason, you can also simply use the
-MightyWatt object to controll the load programmatically:
+MightyWatt object to control the load programmatically:
 
 ```python
 from mightywatt import MightyWatt
@@ -107,7 +107,9 @@ In addition it requires these external dependencies:
 * [pySerial](http://pyserial.sourceforge.net/)
 * [Bottle](http://bottlepy.org)
 
-Both should be automatically fetched and installed from [the Python Package Index](https://pypi.python.org/pypi).
+Both should be automatically fetched and installed from
+[the Python Package Index](https://pypi.python.org/pypi)
+during the installation of this package.
 
 ### Author
 
