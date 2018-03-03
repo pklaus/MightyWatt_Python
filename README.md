@@ -111,6 +111,16 @@ Both should be automatically fetched and installed from
 [the Python Package Index](https://pypi.python.org/pypi)
 during the installation of this package.
 
+### License
+
+This software is published under the terms of the GPLv3, see the LICENSE file in the repository.
+
+Parts of this package are redistributed software products from 3rd parties. They are subject to different licenses:
+
+* [Bootstrap](https://github.com/twbs/bootstrap), MIT License
+* [Glyphicons](https://getbootstrap.com/docs/3.3/components/#glyphicons), MIT License (as part of Bootstrap 3.3)
+* [jQuery](https://github.com/jquery/jquery), MIT License
+
 ### Author
 
 * The MightyWatt is an open hardware/open software product
